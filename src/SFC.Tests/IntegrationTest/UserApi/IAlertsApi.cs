@@ -5,10 +5,10 @@ namespace SFC.Tests.IntegrationTest.UserApi
 {
     public interface IAlertsApi
     {
-        [Post("api/alerts")]
+        [Post("api/v1.0/alerts")]
         Task<Response<string>> PostAlert([Body]PostAlertModel account);
 
-        [Get("api/alerts/{alertId}")]
+        [Get("api/v1.0/alerts/{alertId}")]
         Task<GetAlertModel> GetAlert([Path] string alertId, [Query]string loginName);
     }
 }
