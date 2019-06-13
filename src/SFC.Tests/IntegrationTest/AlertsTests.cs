@@ -25,6 +25,7 @@ namespace SFC.Tests.IntegrationTest
             });
 
             // Act
+
             var client = RestClient.For<IAlertsApi>(_url);
             var postAlertModel = new PostAlertModel
             {
@@ -34,10 +35,14 @@ namespace SFC.Tests.IntegrationTest
                 LoginName = "egzekutor",
                 ZipCode = "43-440"
             };
-            var postAlert = await client.PostAlert(postAlertModel);
 
-            // Assert
-            Assert.Equal(postAlertModel.Id, postAlert);
+            using (var response = await client.PostAlert(postAlertModel))
+            {
+                // Assert
+                Assert.Equal(postAlertModel.Id, response.GetContent());
+                Assert.Equal(HttpStatusCode.Created, response.ResponseMessage.StatusCode);
+            }
+
         }
 
         [Fact]
