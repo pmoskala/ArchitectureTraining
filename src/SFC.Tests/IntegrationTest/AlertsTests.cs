@@ -25,7 +25,6 @@ namespace SFC.Tests.IntegrationTest
             });
 
             // Act
-
             var client = RestClient.For<IAlertsApi>(_url);
             var postAlertModel = new PostAlertModel
             {

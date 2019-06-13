@@ -1,29 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Autofac;
+﻿using Autofac;
 using SFC.Infrastructure;
+using SFC.UserApi.Alerts;
 
 namespace SFC.Alerts
 {
-  public class AutofacAlertsModule : Module
-  {
-    protected override void Load(ContainerBuilder builder)
+    public class AutofacAlertsModule : Module
     {
-      builder.RegisterAssemblyTypes(GetType().Assembly)
+        protected override void Load(ContainerBuilder builder)
+        {
+
+            builder.RegisterType<AlertRepository>().As<IAlertRepository>().InstancePerLifetimeScope();
+
+            builder.RegisterAssemblyTypes(GetType().Assembly)
         .AsClosedTypesOf(typeof(ICommandHandler<>)).AsImplementedInterfaces()
         .InstancePerLifetimeScope();
 
-      builder.RegisterAssemblyTypes(GetType().Assembly)
-        .AsClosedTypesOf(typeof(IEventHandler<>)).AsImplementedInterfaces()
-        .InstancePerLifetimeScope();
+            builder.RegisterAssemblyTypes(GetType().Assembly)
+              .AsClosedTypesOf(typeof(IEventHandler<>)).AsImplementedInterfaces()
+              .InstancePerLifetimeScope();
 
-      builder.RegisterAssemblyTypes(GetType().Assembly)
-        .AsClosedTypesOf(typeof(IQueryHandler<,>)).AsImplementedInterfaces()
-        .InstancePerLifetimeScope();
+            builder.RegisterAssemblyTypes(GetType().Assembly)
+              .AsClosedTypesOf(typeof(IQueryHandler<,>)).AsImplementedInterfaces()
+              .InstancePerLifetimeScope();
 
-      // don't forget to register AlertRepository
-      // builder.RegisterType<AlertRepository>().AsImplementedInterfaces();
+            // don't forget to register AlertRepository
+            // builder.RegisterType<AlertRepository>().AsImplementedInterfaces();
+        }
     }
-  }
 }

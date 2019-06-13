@@ -1,6 +1,5 @@
 ﻿using Autofac;
 using SFC.Infrastructure;
-using SFC.UserApi.Alerts;
 
 namespace SFC.UserApi
 {
@@ -8,7 +7,7 @@ namespace SFC.UserApi
     {
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterType<AlertRepository>().As<IAlertRepository>().InstancePerLifetimeScope();
+
 
             builder.RegisterAssemblyTypes(GetType().Assembly)
               .AsClosedTypesOf(typeof(ICommandHandler<>)).AsImplementedInterfaces()
