@@ -1,12 +1,12 @@
-﻿using System.Collections.Generic;
-using SFC.Alerts.Features.GetAlert;
+﻿using SFC.Alerts.Features.GetAlert;
+using System.Collections.Generic;
 
 namespace SFC.UserApi.Alerts
 {
-  interface IAlertRepository
-  {
-    void Add(Alert alert);
-    IEnumerable<Alert> GetAll(string loginName);
-    Alert Get(string id, string loginName);
-  }
+    public interface IAlertRepository
+    {
+        void Add(Alert alert);
+        IEnumerable<Alert> GetAll(string loginName);
+        Alert Get(string id, string loginName);
+    }
 }

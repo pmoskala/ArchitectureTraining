@@ -1,109 +1,104 @@
-﻿using System;
-using System.Text;
-using Autofac;
-using Autofac.Core;
+﻿using Autofac;
 using Autofac.Extensions.DependencyInjection;
-using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
 using SFC.AdminApi;
-using SFC.Infrastructure;
 using SFC.UserApi;
 using Swashbuckle.AspNetCore.Swagger;
+using System;
 
 namespace SFC
 {
-  public class Startup
-  {
-    public static Action<ContainerBuilder> RegisterExternalTypes { get; set; } = builder => { };
-
-    public Startup(IConfiguration configuration)
+    public class Startup
     {
-      Configuration = configuration;
-    }
+        public static Action<ContainerBuilder> RegisterExternalTypes { get; set; } = builder => { };
 
-    public IConfiguration Configuration { get; }
-
-    // This method gets called by the runtime. Use this method to add services to the container.
-    
-    public IServiceProvider ConfigureServices(IServiceCollection services)
-    {
-      // Add framework services.
-      services
-        .AddMvc(opt =>
+        public Startup(IConfiguration configuration)
         {
-          // Enable fluent validation
-          // opt.Filters.Add(typeof(FluentValidationActionFilter));
-        })
-        .AddApplicationPart(typeof(AutofacUserApiModule).Assembly)
-        .AddApplicationPart(typeof(AutofacAdminApiModule).Assembly)
-        .AddControllersAsServices()
-        .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            Configuration = configuration;
+        }
 
-        // Enable fluent validation
-        //.AddFluentValidation(fvc =>
-        //{
-        //  fvc.RegisterValidatorsFromAssemblyContaining<AutofacUserApiModule>();
-        //  fvc.RegisterValidatorsFromAssemblyContaining<AutofacAdminApiModule>();
-        //});
+        public IConfiguration Configuration { get; }
 
-      services.AddLogging(loggingBuilder =>
-      {
-        loggingBuilder
-          .AddConsole()
-          .AddConfiguration(Configuration.GetSection("logging"))
-          .AddDebug();
-      });
+        // This method gets called by the runtime. Use this method to add services to the container.
 
-      services.AddSwaggerGen(c =>
-      {
-        c.SwaggerDoc("v1", new Info { Title = "SmogFightClub API", Version = "v1" });
-      });
+        public IServiceProvider ConfigureServices(IServiceCollection services)
+        {
+            // Add framework services.
+            services
+              .AddMvc(opt =>
+              {
+                  // Enable fluent validation
+                  // opt.Filters.Add(typeof(FluentValidationActionFilter));
+              })
+              .AddApplicationPart(typeof(AutofacUserApiModule).Assembly)
+              .AddApplicationPart(typeof(AutofacAdminApiModule).Assembly)
+              .AddControllersAsServices()
+              .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
-      // services.AddApiVersioning(o =>
-      // {
-      //   o.AssumeDefaultVersionWhenUnspecified = true;
-      //   o.ReportApiVersions = true;
-      //   o.DefaultApiVersion = new ApiVersion(1, 0);
-      // });
+            // Enable fluent validation
+            //.AddFluentValidation(fvc =>
+            //{
+            //  fvc.RegisterValidatorsFromAssemblyContaining<AutofacUserApiModule>();
+            //  fvc.RegisterValidatorsFromAssemblyContaining<AutofacAdminApiModule>();
+            //});
 
-      // Ioc
-      //var builder = new ContainerBuilder();
-      //string connectionString = Configuration["ConnectionStrings:DefaultConnection"];
-      //builder.RegisterModule(new MainModule(connectionString));
-      //RegisterExternalTypes(builder);
+            services.AddLogging(loggingBuilder =>
+            {
+                loggingBuilder
+            .AddConsole()
+            .AddConfiguration(Configuration.GetSection("logging"))
+            .AddDebug();
+            });
 
-      //builder.Populate(services);
-      //var container = builder.Build();
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new Info { Title = "SmogFightClub API", Version = "v1" });
+            });
 
-      //return new AutofacServiceProvider(container);
+            services.AddApiVersioning(o =>
+            {
+                o.AssumeDefaultVersionWhenUnspecified = true;
+                o.ReportApiVersions = true;
+                o.DefaultApiVersion = new ApiVersion(1, 0);
+            });
 
-      return services.BuildServiceProvider();
+            // Ioc
+            var builder = new ContainerBuilder();
+            string connectionString = Configuration["ConnectionStrings:DefaultConnection"];
+            builder.RegisterModule(new MainModule(connectionString));
+            RegisterExternalTypes(builder);
+
+            builder.Populate(services);
+            var container = builder.Build();
+
+            return new AutofacServiceProvider(container);
+
+            return services.BuildServiceProvider();
+        }
+
+        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        {
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+
+            // Enable middleware to serve generated Swagger as a JSON endpoint.
+            app.UseSwagger();
+
+            // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.), 
+            // specifying the Swagger JSON endpoint.
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "NicePress Api v1");
+            });
+            app.UseMvc();
+        }
     }
-
-    // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-    public void Configure(IApplicationBuilder app, IHostingEnvironment env)
-    {
-      if (env.IsDevelopment())
-      {
-        app.UseDeveloperExceptionPage();
-      }
-
-      // Enable middleware to serve generated Swagger as a JSON endpoint.
-      app.UseSwagger();
-
-      // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.), 
-      // specifying the Swagger JSON endpoint.
-      app.UseSwaggerUI(c =>
-      {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "NicePress Api v1");
-      });
-      app.UseMvc();
-    }
-  }
 }
