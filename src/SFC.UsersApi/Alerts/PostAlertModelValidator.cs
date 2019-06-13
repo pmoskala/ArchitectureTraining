@@ -2,11 +2,12 @@
 
 namespace SFC.UserApi.Alerts
 {
-  public class PostAlertModelValidator : AbstractValidator<PostAlertModel>
-  {
-    public PostAlertModelValidator()
+    public class PostAlertModelValidator : AbstractValidator<PostAlertModel>
     {
-      // validation rules goes here
+        public PostAlertModelValidator()
+        {
+            RuleFor(f => f.Id).NotNull().NotEmpty();
+            RuleFor(f => f.LoginName).NotNull().NotEmpty();
+        }
     }
-  }
 }

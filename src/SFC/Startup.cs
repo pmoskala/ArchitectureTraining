@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -7,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using SFC.AdminApi;
+using SFC.Infrastructure;
 using SFC.UserApi;
 using Swashbuckle.AspNetCore.Swagger;
 using System;
@@ -33,19 +35,19 @@ namespace SFC
               .AddMvc(opt =>
               {
                   // Enable fluent validation
-                  // opt.Filters.Add(typeof(FluentValidationActionFilter));
+                  opt.Filters.Add(typeof(FluentValidationActionFilter));
               })
               .AddApplicationPart(typeof(AutofacUserApiModule).Assembly)
               .AddApplicationPart(typeof(AutofacAdminApiModule).Assembly)
               .AddControllersAsServices()
-              .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+              .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
 
             // Enable fluent validation
-            //.AddFluentValidation(fvc =>
-            //{
-            //  fvc.RegisterValidatorsFromAssemblyContaining<AutofacUserApiModule>();
-            //  fvc.RegisterValidatorsFromAssemblyContaining<AutofacAdminApiModule>();
-            //});
+            .AddFluentValidation(fvc =>
+            {
+                fvc.RegisterValidatorsFromAssemblyContaining<AutofacUserApiModule>();
+                fvc.RegisterValidatorsFromAssemblyContaining<AutofacAdminApiModule>();
+            });
 
             services.AddLogging(loggingBuilder =>
             {
