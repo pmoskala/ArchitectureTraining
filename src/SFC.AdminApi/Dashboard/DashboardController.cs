@@ -1,0 +1,23 @@
+﻿using Microsoft.AspNetCore.Mvc;
+
+namespace SFC.AdminApi.Dashboard
+{
+  [ApiVersion("1.0")]
+  [Route("api/v{version:apiVersion}/[controller]")]
+  [ApiController]
+  public class DashboardController : Controller
+  {
+    private readonly IDashboardPerspective _dashboardPerspective;
+
+    public DashboardController(IDashboardPerspective dashboardPerspective)
+    {
+      _dashboardPerspective = dashboardPerspective;
+    }
+
+    [HttpGet]
+    public IActionResult Get([FromQuery]DashboardQueryModel query)
+    {
+      return Json(_dashboardPerspective.Search(query));
+    }
+  }
+}
