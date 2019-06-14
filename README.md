@@ -1,1 +1,1 @@
-# ArchitetureTraining
+# ArchitectureTraining
