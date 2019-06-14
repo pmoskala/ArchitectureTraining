@@ -11,7 +11,7 @@ using PostAlertModel = SFC.Tests.IntegrationTest.UserApi.PostAlertModel;
 
 namespace SFC.Tests.IntegrationTest
 {
-    public class AlertsTests
+    public class AlertsTests : IDisposable
     {
         private const string _url = "http://localhost:5000";
 
@@ -22,6 +22,7 @@ namespace SFC.Tests.IntegrationTest
             Bootstrap.Run(new string[0], builder =>
             {
                 builder.RegisterType<TestSmtpClient>().AsImplementedInterfaces();
+                builder.RegisterType<TestEventBus>().AsImplementedInterfaces();
             });
 
             // Act
@@ -31,7 +32,7 @@ namespace SFC.Tests.IntegrationTest
                 Id = "1",
                 AdresLine1 = "Goleszów",
                 AdresLine2 = "Nowalijek 10",
-                LoginName = "egzekutor",
+                LoginName = "User123",
                 ZipCode = "43-440"
             };
 
@@ -41,7 +42,6 @@ namespace SFC.Tests.IntegrationTest
                 Assert.Equal(postAlertModel.Id, response.GetContent());
                 Assert.Equal(HttpStatusCode.Created, response.ResponseMessage.StatusCode);
             }
-
         }
 
         [Fact]
@@ -60,6 +60,40 @@ namespace SFC.Tests.IntegrationTest
             // Act, Assert
             ApiException exception = await Assert.ThrowsAsync<ApiException>(async () => await RestClient.For<IAlertsApi>(_url).PostAlert(postAlert));
             Assert.True(exception.StatusCode == HttpStatusCode.BadRequest);
+        }
+
+        [Fact]
+        public async void Post_on_alert_resource_should_create_alert_and_create_email_notification()
+        {
+            // Setup
+            Bootstrap.Run(new string[0], builder =>
+            {
+                builder.RegisterType<TestSmtpClient>().AsImplementedInterfaces();
+            });
+
+            // Act
+            var client = RestClient.For<IAlertsApi>(_url);
+            var postAlertModel = new PostAlertModel
+            {
+                Id = "1",
+                AdresLine1 = "Goleszów",
+                AdresLine2 = "Nowalijek 10",
+                LoginName = "User123",
+                ZipCode = "43-440"
+            };
+
+            using (var response = await client.PostAlert(postAlertModel))
+            {
+                // Assert
+                Assert.Equal(postAlertModel.Id, response.GetContent());
+                Assert.Equal(HttpStatusCode.Created, response.ResponseMessage.StatusCode);
+                Assert.Single(TestSmtpClient.SentEmails);
+            }
+        }
+
+        public void Dispose()
+        {
+            TestSmtpClient.SentEmails.Clear();
         }
     }
 

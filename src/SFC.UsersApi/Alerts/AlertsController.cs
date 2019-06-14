@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SFC.Alerts.Features.GetAlert;
+using SFC.Alerts.Features.CreateAlert;
 using SFC.Infrastructure;
 using System;
 using System.Threading.Tasks;
@@ -11,27 +11,27 @@ namespace SFC.UserApi.Alerts
     [ApiController]
     public class AlertsController : Controller
     {
-        private readonly IAlertRepository _alertRepository;
+        private readonly ICommandBus _commandBus;
 
-        public AlertsController(IAlertRepository alertRepository)
+        public AlertsController(ICommandBus commandBus)
         {
-            _alertRepository = alertRepository;
+            _commandBus = commandBus;
         }
 
         [HttpPost]
         public async Task<IActionResult> PostAlert([FromBody]PostAlertModel alert)
         {
-            var alert1 = new Alert(alert.Id, alert.AdresLine1, alert.AdresLine2, alert.ZipCode, alert.LoginName);
-            _alertRepository.Add(alert1);
-
-            return Created(new Uri($"{BaseUrl.Current}/api/v1.0/confirmations/{alert1.Id}"), alert1.Id);
+            var createAlertCommand = new CreateAlertCommand(alert.Id, alert.AdresLine1, alert.AdresLine2, alert.ZipCode, alert.LoginName);
+            _commandBus.Send(createAlertCommand);
+            return Created(new Uri($"{BaseUrl.Current}/api/v1.0/confirmations/{alert.Id}"), alert.Id);
         }
 
         [HttpGet("api/alerts/{alertId}")]
         async Task<IActionResult> GetAlert(string alertId, [FromQuery] string loginName)
         {
-            var alert = _alertRepository.Get(alertId, loginName);
-            return Json(alert);
+            //var alert = _alertRepository.Get(alertId, loginName);
+            //return Json(alert);
+            return Ok();
         }
     }
 }
