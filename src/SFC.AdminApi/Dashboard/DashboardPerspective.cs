@@ -9,21 +9,21 @@ namespace SFC.AdminApi.Dashboard
 {
     class DashboardPerspective : IDashboardPerspective
     {
-        private readonly IQuery _query;
+        private readonly IQueryBus _queryBus;
 
-        public DashboardPerspective(IQuery query)
+        public DashboardPerspective(IQueryBus queryBus)
         {
-            _query = query;
+            _queryBus = queryBus;
         }
         public DashboardResult Search(DashboardQueryModel query)
         {
-            AccountsReadModel result = _query.Query<AccountsReadModel, AccountQuery>(new AccountQuery
+            AccountsReadModel result = _queryBus.Query<AccountsReadModel, AccountQuery>(new AccountQuery
             {
                 Skip = query.Top,
                 Take = query.Take
             });
 
-            IEnumerable<NotificationsCountResult> counts = _query.Query<IEnumerable<NotificationsCountResult>, NotificationsCountRequest>(
+            IEnumerable<NotificationsCountResult> counts = _queryBus.Query<IEnumerable<NotificationsCountResult>, NotificationsCountRequest>(
                 new NotificationsCountRequest(result.Accounts.Select(x => x.LoginName).ToArray()));
 
             IEnumerable<DashboardEntry> dashboardEntries = counts.Select(x => new DashboardEntry

@@ -9,13 +9,13 @@ namespace SFC.Processes.UserRegistration
     {
         private readonly ICommandBus _commandBus;
         private readonly ISagaRepository _sagaRepository;
-        private readonly IQuery _query;
+        private readonly IQueryBus _query;
         private readonly IPasswordHasher _passwordHasher;
 
         public UserRegistrationHandler(
           ICommandBus commandBus,
           ISagaRepository sagaRepository,
-          IQuery query,
+          IQueryBus query,
           IPasswordHasher passwordHasher)
         {
             _commandBus = commandBus;
